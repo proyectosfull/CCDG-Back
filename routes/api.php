@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\ApiCatalogController;
+use App\Http\Controllers\ApiExpenseController;
+use App\Http\Controllers\ApiSubCatalogController;
+use App\Http\Controllers\ApiUserController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +29,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //Cruds protegidos por permisos
     Route::group(['middleware' => ['permission']], function () {
         //Complete Apis
-        // Route::apiResource('state', ApiStateController::class);
+        Route::apiResource('catalog', ApiCatalogController::class);
+        Route::apiResource('subcatalog', ApiSubCatalogController::class);
+        Route::apiResource('user', ApiUserController::class);
+        Route::apiResource('expense', ApiExpenseController::class);
     });
 });

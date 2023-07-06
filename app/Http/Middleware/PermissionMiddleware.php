@@ -19,9 +19,9 @@ class PermissionMiddleware
     public function handle(Request $request, Closure $next)
     {
         logger('********************| Middleware/PermissionMiddleware:handle > start |********************');
-        if (Auth::guest()) {
-            return redirect('/login');
-        }
+        // if (Auth::guest()) {
+        //     return redirect('/login');
+        // }
         $route = $request->route()?->getName();
         if (!$request->user()->can($route)) {
             abort(response()->json([

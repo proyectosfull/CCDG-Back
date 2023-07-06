@@ -16,13 +16,13 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         logger('********************| Middleware/Authenticate:redirectTo > start |********************');
-        if (! $request->expectsJson()) {
+        if (!$request->expectsJson()) {
+            logger('********************| Middleware/Authenticate:redirectTo > end |********************');
             abort(response()->json([
                 'status' => 0,
                 'title' => 'HTTP_UNAUTHORIZED',
                 'msg' => 'No has iniciado sesión o tu token ha caducado, intenta ingresando nuevamente.',
             ], Response::HTTP_UNAUTHORIZED));
         }
-        logger('********************| Middleware/Authenticate:redirectTo > end |********************');
     }
 }

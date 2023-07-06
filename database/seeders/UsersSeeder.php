@@ -19,9 +19,9 @@ class UsersSeeder extends Seeder
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table('users')->truncate();
-        User::create(['name' => 'ccdg_presidente', 'email' => 'admin@ccdg.com', 'password' => Hash::make('accdg')])
-            ->assignRole('presidente');
-        User::create(['name' => 'ccdg_capturista', 'email' => 'typ@ccdg.com', 'password' => Hash::make('accdg')])
-            ->assignRole('capturista');
+        User::create(['name' => 'ccdg_administrador', 'email' => 'admin@ccdg.com', 'password' => Hash::make('accdg')])
+            ->assignRole('administrador');
+        User::create(['name' => 'ccdg_operador', 'email' => 'ope@ccdg.com', 'password' => Hash::make('accdg')])
+            ->assignRole('operador');
     }
 }
