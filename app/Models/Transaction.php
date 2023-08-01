@@ -38,10 +38,14 @@ class Transaction extends Model
     /**
      * Store
      */
-    static function store(Request $request): Transaction
+    static function store(Request $request, string $title): Transaction
     {
-        // hacer lo de sumar y restar de los centros de costos
         $transaction = new Transaction($request->all());
+        if ($transaction->transaction_type == 'Efectivo') {
+            CostCenter::adjustBudget($transaction->origin_cost_center_id, $transaction->destiny_cost_center_id, $transaction->amount, $title);
+        } else {
+            //pendiente que hacer con activos o donde se guardan
+        }
         $transaction->save();
         return $transaction;
     }
@@ -59,10 +63,57 @@ class Transaction extends Model
     /**
      * Update 
      */
-    function updateModel(Request $request): Transaction
+    function updateModel(Request $request, string $title): Transaction
     {
-        $this->update($request->all());
+        $new_transaction = false;
+        if ($request->has('origin_cost_center_id') || $request->has('destiny_cost_center_id') || $request->has('amount')) {
+            // si se cambio el centro de costos o el monto se tiene que hacer un rollback de la accion en el store
+            CostCenter::adjustBudget($this->destiny_cost_center_id, $this->origin_cost_center_id, $this->amount, $title);
+            $new_transaction = true;
+        }
+        //valida si existe
+        if ($request->has('user_id')) {
+            $this->user_id = $request->user_id;
+        }
+        if ($request->has('origin_cost_center_id')) {
+            $this->origin_cost_center_id = $request->origin_cost_center_id;
+        }
+        if ($request->has('destiny_cost_center_id')) {
+            $this->destiny_cost_center_id = $request->destiny_cost_center_id;
+        }
+        if ($request->has('employee_id')) {
+            $this->employee_id = $request->employee_id;
+        }
+        if ($request->has('expense_concept_id')) {
+            $this->expense_concept_id = $request->expense_concept_id;
+        }
+        if ($request->has('amount')) {
+            $this->amount = $request->amount;
+        }
+        if ($request->has('transaction_type')) {
+            $this->transaction_type = $request->transaction_type;
+        }
+        if ($request->has('date_time')) {
+            $this->date_time = $request->date_time;
+        }
+        if ($request->has('notes')) {
+            $this->notes = $request->notes;
+        }
+        if ($new_transaction && $this->transaction_type == 'Efectivo') {
+            CostCenter::adjustBudget($this->origin_cost_center_id, $this->destiny_cost_center_id, $this->amount, $title);
+        } else {
+            //pendiente que hacer con activos o donde se guardan
+        }
+        $this->save();
         return $this;
+    }
+
+    /** Delete */
+    function deleteModel(string $title): void
+    {
+        //hacemos rollback de los presupuestos reasignados.
+        CostCenter::adjustBudget($this->destiny_cost_center_id, $this->origin_cost_center_id, $this->amount, $title);
+        $this->delete();
     }
 
     /**

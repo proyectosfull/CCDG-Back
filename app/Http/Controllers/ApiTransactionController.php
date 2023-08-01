@@ -45,13 +45,13 @@ class ApiTransactionController extends Controller
 
         $code = Response::HTTP_OK;
         $status = 0;
-        $title = 'Store transaction v23.7.3';
+        $title = 'Store transaction v23.7.4';
         $msg = 'Store failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, true);
 
-        $response = Transaction::store($request);
+        $response = Transaction::store($request, $title);
 
         if (!empty($response)) {
             $status = 1;
@@ -103,13 +103,13 @@ class ApiTransactionController extends Controller
         logger('********************| ApiTransactionController:update > start |********************');
 
         $status = 0;
-        $title = 'Update transaction v23.7.3';
+        $title = 'Update transaction v23.7.4';
         $msg = 'Update failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, false);
 
-        $response = $transaction->updateModel($request);
+        $response = $transaction->updateModel($request, $title);
 
         if (!empty($response)) {
             $status = 1;
@@ -137,12 +137,13 @@ class ApiTransactionController extends Controller
     {
         logger('********************| ApiTransactionController:destroy > start |********************');
 
-        $transaction->delete();
+        $title = 'Delete specific transaction v23.7.4';
+        $transaction->deleteModel($title);
 
         logger('********************| ApiTransactionController:destroy > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Delete specific transaction v23.7.3',
+            'title' => $title,
             'msg' => 'Successful delete!',
         ], Response::HTTP_OK);
     }

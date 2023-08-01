@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Custom\ErrorRequest;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CostCenter extends Model
 {
@@ -61,7 +64,7 @@ class CostCenter extends Model
     }
 
     /**
-     * Queries
+     * Queries / Methods
      */
 
     /**
@@ -71,6 +74,36 @@ class CostCenter extends Model
     {
         return CostCenter::find($cost_center_id)->name;
     }
+
+    /**
+     * Esta funcion recibe el centro de costos de origen y destino y el monto que sera trasladado
+     * @param origin_cost_center_id
+     * @param destiny_cost_center_id
+     * @param amount
+     * @return void for successful or abort if something wrong
+     */
+    public static function adjustBudget($origin_id, $destiny_id, $amount, $title): void
+    {
+        if ($origin_id == $destiny_id) {
+            ErrorRequest::genericErrors(['Los centros de costos tienen que ser diferentes.'], $title);
+        }
+        $origin_cost_center = CostCenter::find($origin_id);
+        $destiny_cost_center = CostCenter::find($destiny_id);
+        $final_budget = $origin_cost_center->budget - $amount;
+        if( $final_budget < 0){
+            ErrorRequest::genericErrors(['El centro de costo de origen no tiene suficientes fondos para cumplir el movimiento.'], $title);
+        }
+        try {
+            DB::beginTransaction();
+            $origin_cost_center->update(['budget' => $final_budget]);
+            $destiny_cost_center->update(['budget' => $destiny_cost_center->budget + $amount]);
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            ErrorRequest::genericErrors(['Error en ajustar el presupuesto '.$e->getMessage()], $title);
+        }
+    }
+
     /**
      * RELATIONSHIPS
      */

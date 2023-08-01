@@ -17,12 +17,10 @@ class ApiUserControllerTest extends TestCase
         'name' => 'name_test',
         'email' => 'email_test@test.com',
         'password' => 'password_test',
-        'role' => 'operadora',
+        'role' => 'Tierraa',
     ];
 
-    /**
-     * Error. @test
-     */
+    /**     * Error. @test     */
     public function store_error_data_empty()
     {
         //2. When => Cuando, realizamos dicha accion
@@ -36,9 +34,7 @@ class ApiUserControllerTest extends TestCase
             ->assertStatus(Response::HTTP_OK);
     }
 
-    /**
-     * Error. @test
-     */
+    /**     * Error. @test     */
     public function store_error_foreign_does_not_exists()
     {
         //2. When => Cuando, realizamos dicha accion
@@ -49,25 +45,21 @@ class ApiUserControllerTest extends TestCase
             ->assertStatus(Response::HTTP_OK);
     }
 
-    /**
-     * Creacion normal. @test
-     */
+    /**     * Creacion normal. @test     */
     public function store_ok()
     {
-        self::$data['role'] = 'operador';
+        self::$data['role'] = 'Tierra';
         //2. When => Cuando, realizamos dicha accion
         $response = $this->post('/api/user', self::$data, ['Authorization' => env('TOKEN_TEST')]);
         //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
         $response
             ->assertSee('Successful store!')
             ->assertSee('name_test')
-            ->assertSee('operador')
+            ->assertSee('Tierra')
             ->assertStatus(Response::HTTP_CREATED);
     }
 
-    /**
-     * error store. @test
-     */
+    /**     * error store. @test     */
     public function store_error_email_already_exists()
     {
         //2. When => Cuando, realizamos dicha accion
@@ -78,21 +70,37 @@ class ApiUserControllerTest extends TestCase
             ->assertStatus(Response::HTTP_OK);
     }
 
-    /**
-     * Creacion normal. @test
-     */
-    public function store_forbidden_for_operator()
+    /**     * Creacion error. @test     */
+    public function store_forbidden_for_tierra()
     {
         //2. When => Cuando, realizamos dicha accion
-        $response = $this->post('/api/user', self::$data, ['Authorization' => env('TOKEN_TEST_OPE')]);
+        $response = $this->post('/api/user', self::$data, ['Authorization' => env('TOKEN_TEST_TIERRA')]);
         //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
         $response
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    /**
-     * Show normal. @test
-     */
+    /**     * Creacion error. @test     */
+    public function store_forbidden_for_aire()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->post('/api/user', self::$data, ['Authorization' => env('TOKEN_TEST_AIRE')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * Creacion error. @test     */
+    public function store_forbidden_for_milagros()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->post('/api/user', self::$data, ['Authorization' => env('TOKEN_TEST_MILAGROS')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * Show normal. @test     */
     public function show_ok()
     {
         self::$id = DB::table('users')->latest()->first()->id;
@@ -105,21 +113,37 @@ class ApiUserControllerTest extends TestCase
             ->assertStatus(Response::HTTP_OK);
     }
 
-    /**
-     * show normal. @test
-     */
-    public function show_forbidden_for_operator()
+    /**     * show error. @test     */
+    public function show_forbidden_for_tierra()
     {
         //2. When => Cuando, realizamos dicha accion
-        $response = $this->get('/api/user/' . self::$id, ['Authorization' => env('TOKEN_TEST_OPE')]);
+        $response = $this->get('/api/user/' . self::$id, ['Authorization' => env('TOKEN_TEST_TIERRA')]);
         //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
         $response
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    /**
-     * Update normal. @test
-     */
+    /**     * show error. @test     */
+    public function show_forbidden_for_aire()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->get('/api/user/' . self::$id, ['Authorization' => env('TOKEN_TEST_AIRE')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * show error. @test     */
+    public function show_forbidden_for_milagros()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->get('/api/user/' . self::$id, ['Authorization' => env('TOKEN_TEST_MILAGROS')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * Update normal. @test     */
     public function update_just_one_field_ok()
     {
         $updated_data = [
@@ -135,28 +159,44 @@ class ApiUserControllerTest extends TestCase
             ->assertStatus(Response::HTTP_OK);
     }
 
-    /**
-     * Update normal. @test
-     */
-    public function update_forbidden_for_operator()
+    /**     * Update error. @test     */
+    public function update_forbidden_for_tierra()
     {
         //2. When => Cuando, realizamos dicha accion
-        $response = $this->put('/api/user/' . self::$id, ['name' => 'name_test_up'], ['Authorization' => env('TOKEN_TEST_OPE')]);
+        $response = $this->put('/api/user/' . self::$id, ['name' => 'name_test_up'], ['Authorization' => env('TOKEN_TEST_TIERRA')]);
         //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
         $response
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    /**
-     * Update normal. @test
-     */
+    /**     * Update error. @test     */
+    public function update_forbidden_for_aire()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->put('/api/user/' . self::$id, ['name' => 'name_test_up'], ['Authorization' => env('TOKEN_TEST_AIRE')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * Update error. @test     */
+    public function update_forbidden_for_milagros()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->put('/api/user/' . self::$id, ['name' => 'name_test_up'], ['Authorization' => env('TOKEN_TEST_MILAGROS')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * Update normal. @test     */
     public function update_ok()
     {
         $updated_data = [
             'name' => 'name_test',
             'email' => 'email_test_up@test.com',
             'password' => 'password_test_up',
-            'role' => 'administrador',
+            'role' => 'Aire',
         ];
         //2. When => Cuando, realizamos dicha accion
         $response = $this->put('/api/user/' . self::$id, $updated_data, ['Authorization' => env('TOKEN_TEST')]);
@@ -165,13 +205,11 @@ class ApiUserControllerTest extends TestCase
             ->assertSee('Successful update!')
             ->assertSee('name_test')
             ->assertSee('email_test_up@test.com')
-            ->assertSee('administrador')
+            ->assertSee('Aire')
             ->assertStatus(Response::HTTP_OK);
     }
 
-    /**
-     * Datatables normal. @test
-     */
+    /**     * Datatables normal. @test     */
     public function index_datatables_ok()
     {
         //2. When => Cuando, realizamos dicha accion
@@ -182,33 +220,67 @@ class ApiUserControllerTest extends TestCase
             ->assertStatus(Response::HTTP_OK);
     }
 
-    /**
-     * Datatables normal. @test
-     */
-    public function index_datatables_forbidden_for_operator()
+    /**     * Datatables error. @test     */
+    public function index_datatables_forbidden_for_tierra()
     {
         //2. When => Cuando, realizamos dicha accion
-        $response = $this->get('/api/user', ['Authorization' => env('TOKEN_TEST_OPE')]);
+        $response = $this->get('/api/user', ['Authorization' => env('TOKEN_TEST_TIERRA')]);
         //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
         $response
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    /**
-     * delete normal. @test
-     */
-    public function delete_forbidden_for_operator()
+    /**     * Datatables error. @test     */
+    public function index_datatables_forbidden_for_aire()
     {
         //2. When => Cuando, realizamos dicha accion
-        $response = $this->delete('/api/user/' . self::$id, [], ['Authorization' => env('TOKEN_TEST_OPE')]);
+        $response = $this->get('/api/user', ['Authorization' => env('TOKEN_TEST_AIRE')]);
         //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
         $response
             ->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
-    /**
-     * delete normal. @test
-     */
+    /**     * Datatables error. @test     */
+    public function index_datatables_forbidden_for_milagros()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->get('/api/user', ['Authorization' => env('TOKEN_TEST_MILAGROS')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * delete error. @test     */
+    public function delete_forbidden_for_tierra()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->delete('/api/user/' . self::$id, [], ['Authorization' => env('TOKEN_TEST_TIERRA')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * delete error. @test     */
+    public function delete_forbidden_for_aire()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->delete('/api/user/' . self::$id, [], ['Authorization' => env('TOKEN_TEST_AIRE')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * delete error. @test     */
+    public function delete_forbidden_for_milagros()
+    {
+        //2. When => Cuando, realizamos dicha accion
+        $response = $this->delete('/api/user/' . self::$id, [], ['Authorization' => env('TOKEN_TEST_MILAGROS')]);
+        //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
+        $response
+            ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**     * delete normal. @test     */
     public function delete_ok()
     {
         //2. When => Cuando, realizamos dicha accion

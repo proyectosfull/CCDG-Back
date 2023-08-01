@@ -129,14 +129,14 @@ class ApiTransactionControllerTest extends TestCase
     public function update_just_one_field_ok()
     {
         $updated_data = [
-            'amount' => 1.99,
+            'transaction_type' => 'Activo',
         ];
         //2. When => Cuando, realizamos dicha accion
         $response = $this->put('/api/transaction/' . self::$id, $updated_data, ['Authorization' => env('TOKEN_TEST')]);
         //3. Then => Entonces, comprobamos los resultados obtenidos y que son los esperados
         $response
             ->assertSee('Successful update!')
-            ->assertSee(1.99)            //campo nuevo
+            ->assertSee('Activo')            //campo nuevo
             ->assertSee('notes_test')                              //campo anterior
             ->assertStatus(Response::HTTP_OK);
     }
@@ -189,7 +189,7 @@ class ApiTransactionControllerTest extends TestCase
             'destiny_cost_center_id' => 3,
             'employee_id' => 4,
             'expense_concept_id' => 2,
-            'transaction_type' => 'Activo',
+            'transaction_type' => 'Efectivo',
             'amount' => 1.01,
             'date_time' => '2023-07-28',
             'notes' => 'notes_test_up',
@@ -204,7 +204,7 @@ class ApiTransactionControllerTest extends TestCase
             ->assertSee(3)
             ->assertSee(4)
             ->assertSee(2)
-            ->assertSee('Activo')
+            ->assertSee('Efectivo')
             ->assertSee(1.01)
             ->assertSee('2023-07-28')
             ->assertSee('notes_test_up')
