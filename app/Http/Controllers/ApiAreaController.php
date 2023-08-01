@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Custom\ErrorRequest;
-use App\Models\User;
+use App\Models\Area;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Symfony\Component\HttpFoundation\Response;
 
-class ApiUserController extends Controller
+class ApiAreaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,15 +18,15 @@ class ApiUserController extends Controller
      */
     public function index()
     {
-        logger('********************| ApiUserController:index > start |********************');
-
-        $data = User::index();
-
-        logger('********************| ApiUserController:index > end |********************');
+        logger('********************| ApiAreaController:index > start |********************');
+        
+        $data = Area::index();
+        
+        logger('********************| ApiAreaController:index > end |********************');
 
         return response()->json([
             'status' => 1,
-            'title' => 'Get all users v23.7.2',
+            'title' => 'Get all areas v23.7.3',
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -40,16 +40,17 @@ class ApiUserController extends Controller
      */
     public function store(Request $request)
     {
-        logger('********************| ApiUserController:store > start |********************');
+        logger('********************| ApiAreaController:store > start |********************');
+
         $code = Response::HTTP_OK;
         $status = 0;
-        $title = 'Store user v23.6.3';
+        $title = 'Store area v23.7.3';
         $msg = 'Store failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, true);
 
-        $response = User::store($request);
+        $response = Area::store($request);
 
         if (!empty($response)) {
             $status = 1;
@@ -58,7 +59,7 @@ class ApiUserController extends Controller
             $code = Response::HTTP_CREATED;
         }
 
-        logger('********************| ApiUserController:store > end |********************');
+        logger('********************| ApiAreaController:store > end |********************');
         
         return response()->json([
             'status' => $status,
@@ -71,20 +72,19 @@ class ApiUserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\Area  $area
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show(Area $area)
     {
-        logger('********************| ApiUserController:show > start |********************');
+        logger('********************| ApiAreaController:show > start |********************');
 
-        $data = $user->showModel();
+        $data = $area->showModel();
 
-        logger('********************| ApiUserController:show > end |********************');
-
+        logger('********************| ApiAreaController:show > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Get specific subcatalog v23.7.2',
+            'title' => 'Get specific area v23.7.3',
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -94,30 +94,30 @@ class ApiUserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\Area  $area
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, Area $area)
     {
-        logger('********************| ApiUserController:update > start |********************');
+        logger('********************| ApiAreaController:update > start |********************');
 
         $status = 0;
-        $title = 'Update user v23.7.2';
+        $title = 'Update area v23.7.3';
         $msg = 'Update failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, false);
 
-        $response = $user->updateModel($request);
+        $response = $area->updateModel($request);
 
         if (!empty($response)) {
             $status = 1;
             $msg = 'Successful update!';
             $data = $response;
         }
-
-        logger('********************| ApiUserController:update > end |********************');
-
+       
+        logger('********************| ApiAreaController:update > end |********************');
+       
         return response()->json([
             'status' => $status,
             'title' => $title,
@@ -129,19 +129,19 @@ class ApiUserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\Area  $area
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(Area $area)
     {
-        logger('********************| ApiUserController:destroy > start |********************');
-
-        $user->delete();
-
-        logger('********************| ApiUserController:destroy > end |********************');
+        logger('********************| ApiAreaController:destroy > start |********************');
+        
+        $area->delete();
+        
+        logger('********************| ApiAreaController:destroy > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Delete specific user v23.7.2',
+            'title' => 'Delete specific area v23.7.3',
             'msg' => 'Successful delete!',
         ], Response::HTTP_OK);
     }
@@ -151,17 +151,12 @@ class ApiUserController extends Controller
      * Valida los campos recibidos en el request, optimizando el store y update
      * @param Request $request
      * @param string $title
-     * @return response json si existen errores
+     * @return response json si existen errores, en caso contrario retorna null.
      */
     private static function fieldsValidation(Request $request, string $title, bool $isStore)
     {
         $validator = Validator::make($request->all(), [
-            //required
-            'email' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255', Rule::unique('users')->whereNull('deleted_at')],
-            'name' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255'],
-            'password' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255'],
-            // 'role' => [($isStore ? 'required' : 'nullable'), 'string', Rule::in(['administrador', 'operador'])],
-            'role' => [($isStore ? 'required' : 'nullable'), 'string', Rule::exists('roles','name')],
+            'name' => [($isStore ? 'required' : 'nullable'), 'string', 'max:100', Rule::unique('areas','name')->whereNull('deleted_at')],
         ]);
 
         ErrorRequest::getErrors($validator->errors(), $title);

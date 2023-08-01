@@ -21,7 +21,11 @@ class UsersSeeder extends Seeder
         DB::table('users')->truncate();
         User::create(['name' => 'ccdg_administrador', 'email' => 'admin@ccdg.com', 'password' => Hash::make('accdg')])
             ->assignRole('administrador');
-        User::create(['name' => 'ccdg_operador', 'email' => 'ope@ccdg.com', 'password' => Hash::make('accdg')])
-            ->assignRole('operador');
+        User::create(['name' => 'ccdg_tierra', 'email' => 'tierra@ccdg.com', 'password' => Hash::make('accdg')])
+            ->assignRole('tierra');
+        User::create(['name' => 'ccdg_aire', 'email' => 'aire@ccdg.com', 'password' => Hash::make('accdg')])
+            ->assignRole('aire');
+        User::create(['name' => 'ccdg_milagros', 'email' => 'milagros@ccdg.com', 'password' => Hash::make('accdg')])
+            ->assignRole('milagros');
     }
 }

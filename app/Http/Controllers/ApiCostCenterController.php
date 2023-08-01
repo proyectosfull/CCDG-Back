@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Custom\ErrorRequest;
-use App\Models\SubCatalog;
+use App\Models\CostCenter;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Symfony\Component\HttpFoundation\Response;
 
-class ApiSubCatalogController extends Controller
+class ApiCostCenterController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,15 +18,15 @@ class ApiSubCatalogController extends Controller
      */
     public function index()
     {
-        logger('********************| ApiSubCatalogController:index > start |********************');
+        logger('********************| ApiCostCenterController:index > start |********************');
 
-        $data = SubCatalog::index();
+        $data = CostCenter::index();
 
-        logger('********************| ApiSubCatalogController:index > end |********************');
+        logger('********************| ApiCostCenterController:index > end |********************');
 
         return response()->json([
             'status' => 1,
-            'title' => 'Get all subcatalogs v23.7.2',
+            'title' => 'Get all cost centers v23.7.3',
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -40,17 +40,17 @@ class ApiSubCatalogController extends Controller
      */
     public function store(Request $request)
     {
-        logger('********************| ApiSubCatalogController:store > start |********************');
+        logger('********************| ApiCostCenterController:store > start |********************');
 
         $code = Response::HTTP_OK;
         $status = 0;
-        $title = 'Store subcatalog v23.7.2';
+        $title = 'Store cost center v23.7.3';
         $msg = 'Store failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, true);
 
-        $response = SubCatalog::store($request, $title);
+        $response = CostCenter::store($request);
 
         if (!empty($response)) {
             $status = 1;
@@ -59,7 +59,7 @@ class ApiSubCatalogController extends Controller
             $code = Response::HTTP_CREATED;
         }
 
-        logger('********************| ApiSubCatalogController:store > end |********************');
+        logger('********************| ApiCostCenterController:store > end |********************');
 
         return response()->json([
             'status' => $status,
@@ -72,19 +72,19 @@ class ApiSubCatalogController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\SubCatalog  $subcatalog
+     * @param  \App\Models\CostCenter  $costCenter
      * @return \Illuminate\Http\Response
      */
-    public function show(SubCatalog $subcatalog)
+    public function show(CostCenter $costCenter)
     {
-        logger('********************| ApiSubCatalogController:show > start |********************');
+        logger('********************| ApiCostCenterController:show > start |********************');
 
-        $data = $subcatalog->showModel();
+        $data = $costCenter->showModel();
 
-        logger('********************| ApiSubCatalogController:show > end |********************');
+        logger('********************| ApiCostCenterController:show > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Get specific subcatalog v23.7.2',
+            'title' => 'Get specific cost center v23.7.3',
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -94,21 +94,21 @@ class ApiSubCatalogController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\SubCatalog  $subcatalog
+     * @param  \App\Models\CostCenter  $costCenter
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, SubCatalog $subcatalog)
+    public function update(Request $request, CostCenter $costCenter)
     {
-        logger('********************| ApiSubCatalogController:update > start |********************');
+        logger('********************| ApiCostCenterController:update > start |********************');
 
         $status = 0;
-        $title = 'Update subcatalog v23.7.2';
+        $title = 'Update cost center v23.7.3';
         $msg = 'Update failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, false);
 
-        $response = $subcatalog->updateModel($request, $title);
+        $response = $costCenter->updateModel($request);
 
         if (!empty($response)) {
             $status = 1;
@@ -116,7 +116,7 @@ class ApiSubCatalogController extends Controller
             $data = $response;
         }
 
-        logger('********************| ApiSubCatalogController:update > end |********************');
+        logger('********************| ApiCostCenterController:update > end |********************');
 
         return response()->json([
             'status' => $status,
@@ -129,19 +129,19 @@ class ApiSubCatalogController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\SubCatalog  $subcatalog
+     * @param  \App\Models\CostCenter  $costCenter
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SubCatalog $subcatalog)
+    public function destroy(CostCenter $costCenter)
     {
-        logger('********************| ApiSubCatalogController:destroy > start |********************');
+        logger('********************| ApiCostCenterController:destroy > start |********************');
 
-        $subcatalog->delete();
+        $costCenter->delete();
 
-        logger('********************| ApiSubCatalogController:destroy > end |********************');
+        logger('********************| ApiCostCenterController:destroy > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Delete specific subcatalog v23.7.2',
+            'title' => 'Delete specific cost center v23.7.3',
             'msg' => 'Successful delete!',
         ], Response::HTTP_OK);
     }
@@ -155,12 +155,9 @@ class ApiSubCatalogController extends Controller
      */
     private static function fieldsValidation(Request $request, string $title, bool $isStore)
     {
-        //TO DO hacer el validation con los campos
-
         $validator = Validator::make($request->all(), [
-            'name' => [($isStore ? 'required' : 'nullable'), 'string', 'max:100', Rule::unique('subcatalogs', 'name')->whereNull('deleted_at')],
-            'catalog_id' => [($isStore ? 'required' : 'nullable'), 'integer', Rule::exists('catalogs', 'id')->whereNull('deleted_at')],
-            'description' => ['nullable', 'string', 'max:255'],
+            'name' => [($isStore ? 'required' : 'nullable'), 'string', 'max:100', Rule::unique('cost_centers', 'name')->whereNull('deleted_at')],
+            'budget' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
         ]);
 
         ErrorRequest::getErrors($validator->errors(), $title);

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Custom\ErrorRequest;
-use App\Models\User;
+use App\Models\ConceptAsset;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Symfony\Component\HttpFoundation\Response;
 
-class ApiUserController extends Controller
+class ApiConceptAssetController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,15 +18,15 @@ class ApiUserController extends Controller
      */
     public function index()
     {
-        logger('********************| ApiUserController:index > start |********************');
+        logger('********************| ApiConceptAssetController:index > start |********************');
 
-        $data = User::index();
+        $data = ConceptAsset::index();
 
-        logger('********************| ApiUserController:index > end |********************');
+        logger('********************| ApiConceptAssetController:index > end |********************');
 
         return response()->json([
             'status' => 1,
-            'title' => 'Get all users v23.7.2',
+            'title' => 'Get all concept assets v23.7.3',
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -40,16 +40,17 @@ class ApiUserController extends Controller
      */
     public function store(Request $request)
     {
-        logger('********************| ApiUserController:store > start |********************');
+        logger('********************| ApiConceptAssetController:store > start |********************');
+
         $code = Response::HTTP_OK;
         $status = 0;
-        $title = 'Store user v23.6.3';
+        $title = 'Store concept asset v23.7.3';
         $msg = 'Store failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, true);
 
-        $response = User::store($request);
+        $response = ConceptAsset::store($request);
 
         if (!empty($response)) {
             $status = 1;
@@ -58,8 +59,8 @@ class ApiUserController extends Controller
             $code = Response::HTTP_CREATED;
         }
 
-        logger('********************| ApiUserController:store > end |********************');
-        
+        logger('********************| ApiConceptAssetController:store > end |********************');
+
         return response()->json([
             'status' => $status,
             'title' => $title,
@@ -71,20 +72,19 @@ class ApiUserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\ConceptAsset  $conceptAsset
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show(ConceptAsset $conceptAsset)
     {
-        logger('********************| ApiUserController:show > start |********************');
+        logger('********************| ApiConceptAssetController:show > start |********************');
 
-        $data = $user->showModel();
+        $data = $conceptAsset->showModel();
 
-        logger('********************| ApiUserController:show > end |********************');
-
+        logger('********************| ApiConceptAssetController:show > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Get specific subcatalog v23.7.2',
+            'title' => 'Get specific concept asset v23.7.3',
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -94,21 +94,21 @@ class ApiUserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\ConceptAsset  $conceptAsset
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, ConceptAsset $conceptAsset)
     {
-        logger('********************| ApiUserController:update > start |********************');
+        logger('********************| ApiConceptAssetController:update > start |********************');
 
         $status = 0;
-        $title = 'Update user v23.7.2';
+        $title = 'Update concept asset v23.7.3';
         $msg = 'Update failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, false);
 
-        $response = $user->updateModel($request);
+        $response = $conceptAsset->updateModel($request);
 
         if (!empty($response)) {
             $status = 1;
@@ -116,7 +116,7 @@ class ApiUserController extends Controller
             $data = $response;
         }
 
-        logger('********************| ApiUserController:update > end |********************');
+        logger('********************| ApiConceptAssetController:update > end |********************');
 
         return response()->json([
             'status' => $status,
@@ -129,19 +129,19 @@ class ApiUserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\ConceptAsset  $conceptAsset
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(ConceptAsset $conceptAsset)
     {
-        logger('********************| ApiUserController:destroy > start |********************');
+        logger('********************| ApiConceptAssetController:destroy > start |********************');
 
-        $user->delete();
+        $conceptAsset->delete();
 
-        logger('********************| ApiUserController:destroy > end |********************');
+        logger('********************| ApiConceptAssetController:destroy > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Delete specific user v23.7.2',
+            'title' => 'Delete specific concept asset v23.7.3',
             'msg' => 'Successful delete!',
         ], Response::HTTP_OK);
     }
@@ -151,17 +151,12 @@ class ApiUserController extends Controller
      * Valida los campos recibidos en el request, optimizando el store y update
      * @param Request $request
      * @param string $title
-     * @return response json si existen errores
+     * @return response json si existen errores, en caso contrario retorna null.
      */
     private static function fieldsValidation(Request $request, string $title, bool $isStore)
     {
         $validator = Validator::make($request->all(), [
-            //required
-            'email' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255', Rule::unique('users')->whereNull('deleted_at')],
-            'name' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255'],
-            'password' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255'],
-            // 'role' => [($isStore ? 'required' : 'nullable'), 'string', Rule::in(['administrador', 'operador'])],
-            'role' => [($isStore ? 'required' : 'nullable'), 'string', Rule::exists('roles','name')],
+            'name' => [($isStore ? 'required' : 'nullable'), 'string', 'max:100', Rule::unique('concept_assets', 'name')->whereNull('deleted_at')],
         ]);
 
         ErrorRequest::getErrors($validator->errors(), $title);

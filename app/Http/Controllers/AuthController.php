@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Custom\ErrorRequest;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,5 +69,18 @@ class AuthController extends Controller
             'title' => 'Cerrar sesión v23.7.1',
             'msg' => 'Se cerró sesión correctamente.',
         ], Response::HTTP_OK);
+    }
+
+    public static function getRoleName(Request $request, string $title)
+    {
+        logger('********************| AuthController:getRoleName > start |********************');
+
+        $roleName = $request->user()->getRoleNames()[0] ?? null;
+
+        if (is_null($roleName)) {
+            ErrorRequest::genericErrors(['ERROR: El usuario no tiene un rol asignado.'], $title);
+        }
+        logger('********************| AuthController:getRoleName > end |********************');
+        return $roleName;
     }
 }

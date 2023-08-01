@@ -4,14 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 
-class Catalog extends Model
+class Area extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = [
+        'name',
+    ];
 
     protected $hidden = [
         'created_at',
@@ -21,33 +24,32 @@ class Catalog extends Model
 
     static function index()
     {
-        return Catalog::with('subcatalogs')->paginate(50);
+        return Area::paginate(50);
     }
 
     /**
      * Store
      */
-    static function store(Request $request): Catalog
+    static function store(Request $request): Area
     {
-        $catalog = new Catalog($request->all());
-        $catalog->save();
-        return $catalog;
+        $area = new Area($request->all());
+        $area->save();
+        return $area;
     }
 
     /**
      * Show
      */
-    function showModel(): Catalog
+    function showModel(): Area
     {
-        return $this->with('subcatalogs')
-            ->where('id', $this->id)
+        return Area::where('id', $this->id)
             ->first();
     }
 
     /**
      * Update 
      */
-    function updateModel(Request $request): Catalog
+    function updateModel(Request $request): Area
     {
         $this->update($request->all());
         return $this;
@@ -57,10 +59,12 @@ class Catalog extends Model
      * RELATIONSHIPS
      */
     /**
-     * Get all of the expenses for the Catalog
+     * Get all of the employee_records for the Area
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function expenses()
+    public function employee_records(): HasMany
     {
-        return $this->hasMany(Expense::class);
+        return $this->hasMany(EmployeeRecord::class);
     }
 }

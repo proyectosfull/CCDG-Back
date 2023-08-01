@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Custom\ErrorRequest;
-use App\Models\Catalog;
+use App\Models\ConceptExpenseByUser;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Symfony\Component\HttpFoundation\Response;
 
-class ApiCatalogController extends Controller
+class ApiConceptExpenseByUserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,15 +18,15 @@ class ApiCatalogController extends Controller
      */
     public function index()
     {
-        logger('********************| ApiCatalogController:index > start |********************');
-        
-        $data = Catalog::index();
-        
-        logger('********************| ApiCatalogController:index > end |********************');
+        logger('********************| ApiConceptExpenseByUserController:index > start |********************');
+
+        $data = ConceptExpenseByUser::index();
+
+        logger('********************| ApiConceptExpenseByUserController:index > end |********************');
 
         return response()->json([
             'status' => 1,
-            'title' => 'Get all catalogs v23.7.2',
+            'title' => 'Get all concept expense by users v23.7.3',
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -40,17 +40,17 @@ class ApiCatalogController extends Controller
      */
     public function store(Request $request)
     {
-        logger('********************| ApiCatalogController:store > start |********************');
+        logger('********************| ApiConceptExpenseByUserController:store > start |********************');
 
         $code = Response::HTTP_OK;
         $status = 0;
-        $title = 'Store catalog v23.7.2';
+        $title = 'Store concept expense by user v23.7.3';
         $msg = 'Store failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, true);
 
-        $response = Catalog::store($request, $title);
+        $response = ConceptExpenseByUser::store($request);
 
         if (!empty($response)) {
             $status = 1;
@@ -59,8 +59,8 @@ class ApiCatalogController extends Controller
             $code = Response::HTTP_CREATED;
         }
 
-        logger('********************| ApiCatalogController:store > end |********************');
-        
+        logger('********************| ApiConceptExpenseByUserController:store > end |********************');
+
         return response()->json([
             'status' => $status,
             'title' => $title,
@@ -72,19 +72,19 @@ class ApiCatalogController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Catalog  $catalog
+     * @param  \App\Models\ConceptExpenseByUser  $conceptExpenseByUser
      * @return \Illuminate\Http\Response
      */
-    public function show(Catalog $catalog)
+    public function show(ConceptExpenseByUser $conceptExpenseByUser)
     {
-        logger('********************| ApiCatalogController:show > start |********************');
+        logger('********************| ApiConceptExpenseByUserController:show > start |********************');
 
-        $data = $catalog->showModel();
+        $data = $conceptExpenseByUser->showModel();
 
-        logger('********************| ApiCatalogController:show > end |********************');
+        logger('********************| ApiConceptExpenseByUserController:show > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Get specific catalog v23.7.2',
+            'title' => 'Get specific concept expense by user v23.7.3',
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -94,30 +94,30 @@ class ApiCatalogController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Catalog  $catalog
+     * @param  \App\Models\ConceptExpenseByUser  $conceptExpenseByUser
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Catalog $catalog)
+    public function update(Request $request, ConceptExpenseByUser $conceptExpenseByUser)
     {
-        logger('********************| ApiCatalogController:update > start |********************');
+        logger('********************| ApiConceptExpenseByUserController:update > start |********************');
 
         $status = 0;
-        $title = 'Update catalog v23.7.2';
+        $title = 'Update concept expense by user v23.7.3';
         $msg = 'Update failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, false);
 
-        $response = $catalog->updateModel($request, $title);
+        $response = $conceptExpenseByUser->updateModel($request);
 
         if (!empty($response)) {
             $status = 1;
             $msg = 'Successful update!';
             $data = $response;
         }
-       
-        logger('********************| ApiCatalogController:update > end |********************');
-       
+
+        logger('********************| ApiConceptExpenseByUserController:update > end |********************');
+
         return response()->json([
             'status' => $status,
             'title' => $title,
@@ -129,19 +129,19 @@ class ApiCatalogController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Catalog  $catalog
+     * @param  \App\Models\ConceptExpenseByUser  $conceptExpenseByUser
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Catalog $catalog)
+    public function destroy(ConceptExpenseByUser $conceptExpenseByUser)
     {
-        logger('********************| ApiCatalogController:destroy > start |********************');
-        
-        $catalog->delete();
-        
-        logger('********************| ApiCatalogController:destroy > end |********************');
+        logger('********************| ApiConceptExpenseByUserController:destroy > start |********************');
+
+        $conceptExpenseByUser->delete();
+
+        logger('********************| ApiConceptExpenseByUserController:destroy > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Delete specific catalog v23.7.2',
+            'title' => 'Delete specific concept expense by user v23.7.3',
             'msg' => 'Successful delete!',
         ], Response::HTTP_OK);
     }
@@ -155,11 +155,9 @@ class ApiCatalogController extends Controller
      */
     private static function fieldsValidation(Request $request, string $title, bool $isStore)
     {
-        //TO DO hacer el validation con los campos
-
         $validator = Validator::make($request->all(), [
-            'name' => [($isStore ? 'required' : 'nullable'), 'string', 'max:100', Rule::unique('catalogs','name')->whereNull('deleted_at')],
-            'description' => ['nullable', 'string', 'max:255'],
+            'user_id' => [($isStore ? 'required' : 'nullable'), 'integer', Rule::exists('users', 'id')->whereNull('deleted_at')],
+            'expense_concept_id' => [($isStore ? 'required' : 'nullable'), 'integer', Rule::exists('expense_concepts', 'id')->whereNull('deleted_at')],
         ]);
 
         ErrorRequest::getErrors($validator->errors(), $title);

@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('catalogs', function (Blueprint $table) {
+        Schema::create('employee_records', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100)->nullable();
-            $table->string('description')->nullable();
+            $table->string('full_name', 150)->nullable();
+            $table->double('monthly_salary', 8,2)->nullable();
+            $table->foreignId('area_id')->nullable()->constrained('areas','id')->nullOnDelete();
+            $table->foreignId('subcost_center_id')->nullable()->constrained('subcost_centers','id')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('catalogs');
+        Schema::dropIfExists('employee_records');
     }
 };

@@ -13,11 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('subcatalogs', function (Blueprint $table) {
+        Schema::create('concept_expense_by_users', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100)->nullable();
-            $table->string('description')->nullable();
-            $table->foreignId('catalog_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users','id')->nullOnDelete();
+            $table->foreignId('expense_concept_id')->nullable()->constrained('expense_concepts','id')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('subcatalogs');
+        Schema::dropIfExists('concept_expense_by_users');
     }
 };

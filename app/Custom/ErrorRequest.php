@@ -2,8 +2,10 @@
 
 namespace App\Custom;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\MessageBag;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ErrorRequest
@@ -59,5 +61,22 @@ class ErrorRequest
             }
         }
         // return null;
+    }
+
+    /**
+     * Validación para los operadores, si este intenta asignar otro centro de costo que no le pertenece, aborta y le manda
+     * un forbidden, el role administracion puede pasar por los permisos sin problema
+     * @return void si se tienen los permisos.
+     */
+    public static function assertPermission(User $user, string $role, string $title): void
+    {
+        if ($user->hasRole($role) || $user->hasRole('Administración')) {
+            return;
+        }
+        abort(response()->json([
+            'status' => 0,
+            'title' => $title,
+            'errors' => 'El centro de costo que deseas asignar no corresponde a tu rol.',
+        ], Response::HTTP_FORBIDDEN));
     }
 }

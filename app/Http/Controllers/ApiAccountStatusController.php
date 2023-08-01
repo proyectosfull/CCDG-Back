@@ -3,30 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Custom\ErrorRequest;
-use App\Models\User;
+use App\Models\AccountStatus;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Symfony\Component\HttpFoundation\Response;
 
-class ApiUserController extends Controller
+class ApiAccountStatusController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        logger('********************| ApiUserController:index > start |********************');
+        logger('********************| ApiAccountStatusController:index > start |********************');
 
-        $data = User::index();
+        $title = 'Get all account statuses v23.7.3';
+        $data = AccountStatus::index($request, $title);
 
-        logger('********************| ApiUserController:index > end |********************');
+        logger('********************| ApiAccountStatusController:index > end |********************');
 
         return response()->json([
             'status' => 1,
-            'title' => 'Get all users v23.7.2',
+            'title' => $title,
             'msg' => 'Successful get!',
             'data' => $data
         ], Response::HTTP_OK);
@@ -40,16 +41,17 @@ class ApiUserController extends Controller
      */
     public function store(Request $request)
     {
-        logger('********************| ApiUserController:store > start |********************');
+        logger('********************| ApiAccountStatusController:store > start |********************');
+
         $code = Response::HTTP_OK;
         $status = 0;
-        $title = 'Store user v23.6.3';
+        $title = 'Store account status v23.7.3';
         $msg = 'Store failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, true);
 
-        $response = User::store($request);
+        $response = AccountStatus::store($request, $title);
 
         if (!empty($response)) {
             $status = 1;
@@ -58,8 +60,8 @@ class ApiUserController extends Controller
             $code = Response::HTTP_CREATED;
         }
 
-        logger('********************| ApiUserController:store > end |********************');
-        
+        logger('********************| ApiAccountStatusController:store > end |********************');
+
         return response()->json([
             'status' => $status,
             'title' => $title,
@@ -71,22 +73,22 @@ class ApiUserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\AccountStatus  $accountStatus
      * @return \Illuminate\Http\Response
      */
-    public function show(User $user)
+    public function show(Request $request, AccountStatus $accountStatus)
     {
-        logger('********************| ApiUserController:show > start |********************');
+        logger('********************| ApiAccountStatusController:show > start |********************');
 
-        $data = $user->showModel();
+        $title = 'Get specific account status v23.7.3';
+        $data = $accountStatus->showModel($request, $title);
 
-        logger('********************| ApiUserController:show > end |********************');
-
+        logger('********************| ApiAccountStatusController:show > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Get specific subcatalog v23.7.2',
+            'title' => $title,
             'msg' => 'Successful get!',
-            'data' => $data
+            'data' => $data ?? [],
         ], Response::HTTP_OK);
     }
 
@@ -94,21 +96,21 @@ class ApiUserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\AccountStatus  $accountStatus
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, AccountStatus $accountStatus)
     {
-        logger('********************| ApiUserController:update > start |********************');
+        logger('********************| ApiAccountStatusController:update > start |********************');
 
         $status = 0;
-        $title = 'Update user v23.7.2';
+        $title = 'Update account status v23.7.3';
         $msg = 'Update failed!';
         $data = [];
 
         self::fieldsValidation($request, $title, false);
 
-        $response = $user->updateModel($request);
+        $response = $accountStatus->updateModel($request, $title);
 
         if (!empty($response)) {
             $status = 1;
@@ -116,7 +118,7 @@ class ApiUserController extends Controller
             $data = $response;
         }
 
-        logger('********************| ApiUserController:update > end |********************');
+        logger('********************| ApiAccountStatusController:update > end |********************');
 
         return response()->json([
             'status' => $status,
@@ -129,19 +131,19 @@ class ApiUserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\User  $user
+     * @param  \App\Models\AccountStatus  $accountStatus
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(AccountStatus $accountStatus)
     {
-        logger('********************| ApiUserController:destroy > start |********************');
+        logger('********************| ApiAccountStatusController:destroy > start |********************');
 
-        $user->delete();
+        $accountStatus->delete();
 
-        logger('********************| ApiUserController:destroy > end |********************');
+        logger('********************| ApiAccountStatusController:destroy > end |********************');
         return response()->json([
             'status' => 1,
-            'title' => 'Delete specific user v23.7.2',
+            'title' => 'Delete specific account status v23.7.3',
             'msg' => 'Successful delete!',
         ], Response::HTTP_OK);
     }
@@ -151,17 +153,13 @@ class ApiUserController extends Controller
      * Valida los campos recibidos en el request, optimizando el store y update
      * @param Request $request
      * @param string $title
-     * @return response json si existen errores
      */
     private static function fieldsValidation(Request $request, string $title, bool $isStore)
     {
         $validator = Validator::make($request->all(), [
-            //required
-            'email' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255', Rule::unique('users')->whereNull('deleted_at')],
-            'name' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255'],
-            'password' => [($isStore ? 'required' : 'nullable'), 'string', 'max:255'],
-            // 'role' => [($isStore ? 'required' : 'nullable'), 'string', Rule::in(['administrador', 'operador'])],
-            'role' => [($isStore ? 'required' : 'nullable'), 'string', Rule::exists('roles','name')],
+            'cost_center_id' => [($isStore ? 'required' : 'nullable'), 'integer', Rule::exists('cost_centers', 'id')->whereNull('deleted_at')],
+            'current_stock' => [($isStore ? 'required' : 'nullable'), 'integer'],
+            'concept_asset_id' => [($isStore ? 'required' : 'nullable'), 'integer', Rule::exists('concept_assets', 'id')->whereNull('deleted_at')],
         ]);
 
         ErrorRequest::getErrors($validator->errors(), $title);

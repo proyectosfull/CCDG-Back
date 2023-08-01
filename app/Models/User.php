@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
@@ -97,12 +98,22 @@ class User extends Authenticatable
     /**
      * Relationships
      */
-
     /**
-     * Get all of the expenses for the User
+     * Get all of the concept_expense_by_user for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function expenses()
+    public function concept_expense_by_users(): HasMany
     {
-        return $this->hasMany(Expense::class);
+        return $this->hasMany(ConceptExpenseByUser::class);
+    }
+    /**
+     * Get all of the transactions for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 }
